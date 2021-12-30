@@ -69,6 +69,7 @@ void MandlebrotSerial_SSE()
 		const auto imageHeight = _mm_set_ps1((float)mandlebrot::imageHeight);
 		const auto stableThresh = _mm_set_ps1(4.0f);
 		const auto two = _mm_set_ps1(2.0f);
+		const __m128 xIndicesIncrement = {3.f, 2.f, 1.f,  0.f};
 
 		alignas(64) static const __m128i iterationsIncrement[16]
 		{
@@ -100,7 +101,9 @@ void MandlebrotSerial_SSE()
 				std::pair<float, float> cNumber{ 0.f, 0.f };
 
 				auto yCoordS = _mm_set_ps1((float)yCoord);
-				auto xCoords = _mm_cvtepi32_ps(_mm_set_epi32(xCoordBy4, xCoordBy4 + 1, xCoordBy4 + 2, xCoordBy4 + 3));
+				
+				auto xCoords = _mm_set_ps1((float)xCoordBy4);
+				xCoords = _mm_add_ps(xCoords, xIndicesIncrement);
 
 				//realPart = mandlebrot::realPartStart + ((float)xCoord / (float)mandlebrot::imageWidth) * (mandlebrot::realPartEnd - mandlebrot::realPartStart);
 				const auto realPartsIncrement = _mm_add_ps(realPartStart,
